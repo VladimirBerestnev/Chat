@@ -1,9 +1,6 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
@@ -79,10 +76,14 @@ public class Server {
         }
     }
 
-    public void broadcastMsg(ClientHandler sender, String msg) {
+    public void broadcastMsg(ClientHandler sender, String msg) throws IOException {
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter("chat1.txt", true))){
+
         String message = String.format("%s : %s", sender.getNickName(), msg);
+        bw.write(message + "\n");
         for (ClientHandler c : clients) {
             c.sendMsg(message);
+        }
         }
     }
 
