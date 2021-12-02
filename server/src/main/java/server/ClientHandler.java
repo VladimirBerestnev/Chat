@@ -43,6 +43,7 @@ public class ClientHandler {
                          }
 
                          //String newNick = server.getAuthService().getNicknameByLoginAndPassword(token[1], token[2]);
+                         // Авторизация пользователя через БД
                          String newNick = server.getNicknameByLoginAndPasswordDB(token[1], token[2]);
 
                          if (newNick != null) {
@@ -69,6 +70,7 @@ public class ClientHandler {
                              continue;
                          }
                    //      boolean b = server.getAuthService().registration(token[1], token[2], token[3]);
+                         //Регистрация пользователя в БД
                          boolean b = server.getRegistration(token[1], token[2], token[3]);
                          if (b) {
                              sendMsg("/reg_ok");

@@ -26,6 +26,7 @@ public class Server {
 
         try {
             server = new ServerSocket(PORT);
+            //Соединение с БД
             connectDB();
             System.out.println("Started");
 
@@ -64,6 +65,7 @@ public class Server {
             try {
                 socket.close();
                 server.close();
+                //Закрыть соединение с БД
                 disconnectDB();
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
@@ -133,7 +135,7 @@ public class Server {
             c.sendMsg(msg);
         }
     }
-
+    //Классы по работе с БД
     public void connectDB() throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:chat.db");
     }
