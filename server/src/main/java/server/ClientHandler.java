@@ -28,21 +28,16 @@ public class ClientHandler {
 
          new Thread(() -> {
              try {
-
-
                  // цикл аутентификации
                  while (true) {
-
                      String str = in.readUTF();
                      if (str.equals("/end")) {
                          out.writeUTF("/end");
                          throw (new RuntimeException("Клиент отключился"));
                      }
 
-
                      if (str.startsWith("/auth")) {
                          String[] token = str.split("\\s");
-
                          if (token.length < 3) {
                              continue;
                          }
@@ -62,13 +57,9 @@ public class ClientHandler {
                              } else {
                                  sendMsg("This login already used");
                              }
-
-
                          } else {
                              sendMsg("wrong login or password");
                          }
-
-
                      }
 
                      //Registration
@@ -84,22 +75,18 @@ public class ClientHandler {
                          } else {
                              sendMsg("/reg_no");
                          }
-
                      }
-
                  }
 
                  // цикл работы
                  while (true) {
 
                      String str = in.readUTF();
-
                      if (str.startsWith("/")) {
                          if (str.equals("/end")) {
                              out.writeUTF("/end");
                              break;
                          }
-
                          if (str.startsWith("/change")) {
                              String[] nick = str.split("\\s+", 2);
                              System.out.println(nick[1]);
@@ -113,35 +100,22 @@ public class ClientHandler {
 
                                  sendMsg("/auth_ok " + newNick);
                                  server.subscribe(this);
-
                              break;}
                              else {
                                  sendMsg("This login already used");
                              }
-
-
                          }
-
-
-
 
                          if (str.startsWith("/w")) {
                              String[] personMsg = str.split("\\s+", 3);
                              server.personalMsg(this, personMsg[1], personMsg[2]);
-
                          }
                      } else {
-
                          server.broadcastMsg(this, str);
-
                      }
-
-
                  }
-
              }catch (RuntimeException e) {
                  System.out.println(e.getMessage());
-
              } catch (IOException | SQLException e) {
                  e.printStackTrace();
              } finally {
@@ -153,17 +127,12 @@ public class ClientHandler {
                      e.printStackTrace();
                  }
              }
-
-
          }).start();
 
      } catch (IOException e) {
          e.printStackTrace();
      }
-
-
  }
-
 
     public void sendMsg (String msg) {
      try {

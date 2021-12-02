@@ -29,7 +29,6 @@ public class Server {
             connectDB();
             System.out.println("Started");
 
-
             while (true) {
 
                 socket = server.accept();
@@ -44,51 +43,39 @@ public class Server {
 
                         while (true) {
                             String str = in2.nextLine();
-
                             broadcastMsgServer("Server : " + str);
                         }
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
-
                         try {
                             socket.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-
-
                 });
                 t1.start();
             }
-
         } catch (IOException | SQLException e) {
             e.printStackTrace();
 
         } finally {
-
             try {
                 socket.close();
                 server.close();
                 disconnectDB();
-
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
             }
         }
-
     }
 
     public void broadcastMsgServer(String msg) {
-
         for (ClientHandler c : clients) {
             c.sendMsg(msg);
-
         }
     }
-
 
     public void broadcastMsg(ClientHandler sender, String msg) {
         String message = String.format("%s : %s", sender.getNickName(), msg);
@@ -100,7 +87,6 @@ public class Server {
     public void personalMsg(ClientHandler client, String nick, String msg) {
 
         String message = String.format("%s(private) : %s", client.getNickName(), msg);
-
         for (ClientHandler c : clients) {
             if (c.getNickName().equals(nick)) {
                 c.sendMsg(message);
@@ -110,23 +96,18 @@ public class Server {
                 client.sendMsg(message);
                 return;
             }
-
         }
         client.sendMsg("Пользователь не найден " + nick);
-
     }
-
 
     public void subscribe(ClientHandler clientHandler) {
         clients.add(clientHandler);
         broadcastClientList();
-
     }
 
     public void unsubscribe(ClientHandler clientHandler) {
         clients.remove(clientHandler);
         broadcastClientList();
-
     }
 
     public AuthService getAuthService() {
@@ -138,10 +119,8 @@ public class Server {
             if (c.getLogin().equals(login)) {
                 return true;
             }
-
         }
         return false;
-
     }
 
     public void broadcastClientList() {
@@ -153,7 +132,6 @@ public class Server {
         for (ClientHandler c : clients) {
             c.sendMsg(msg);
         }
-
     }
 
     public void connectDB() throws SQLException {
@@ -180,11 +158,9 @@ public class Server {
                 String password = rs.getString(3);
 
                 System.out.printf("%s - %s - %s", nickname, login, password);
-
             }
         }
     }
-
 
     public String getNicknameByLoginAndPasswordDB(String login, String password) {
         try (PreparedStatement ps = connection.prepareStatement("select nickname from users where login = ? AND password = ?")) {
@@ -194,7 +170,6 @@ public class Server {
             while (rs.next()) {
                 return rs.getString(1);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -213,12 +188,9 @@ public class Server {
                     return null;
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         return nick;
     }
 
@@ -236,7 +208,6 @@ public class Server {
         return null;
     }
 
-
     public boolean getRegistration(String token1, String token2, String token3) {
 
         String nickname = checkNick(token3);
@@ -248,11 +219,9 @@ public class Server {
                 ps1.executeUpdate();
                 return true;
 
-
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
         }
         return false;
     }
