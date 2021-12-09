@@ -3,10 +3,17 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.apache.commons.io.input.ReversedLinesFileReader;
 
 public class Server {
 
@@ -16,8 +23,14 @@ public class Server {
     private List<ClientHandler> clients;
     private AuthService authService;
     private Connection connection;
+    private ExecutorService executorService;
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
 
     public Server() {
+        executorService = Executors.newCachedThreadPool();
         clients = new CopyOnWriteArrayList<>();
         authService = new SimpleAuthService();
 
@@ -87,6 +100,28 @@ public class Server {
         }
     }
 
+    public void reverseFile (ClientHandler clientHandler) throws IOException {
+        File file = new File("chat1.txt");
+        ArrayList<String> chatLines = new ArrayList<>();
+       ReversedLinesFileReader reader = new ReversedLinesFileReader(file, Charset.defaultCharset());
+            String line;
+
+            int n_lines = 100;
+            int counter = 0;
+
+        while((line = reader.readLine()) != null && counter < n_lines)
+        {
+            chatLines.add(line);
+            counter++;
+        }
+
+        for (int j = 1; j < chatLines.size() + 1; j++) {
+            clientHandler.sendMsg(chatLines.get(chatLines.size() - j));
+        }
+        reader.close();
+    }
+
+
     public void personalMsg(ClientHandler client, String nick, String msg) {
 
         String message = String.format("%s(private) : %s", client.getNickName(), msg);
@@ -103,9 +138,12 @@ public class Server {
         client.sendMsg("Пользователь не найден " + nick);
     }
 
-    public void subscribe(ClientHandler clientHandler) {
+    public void subscribe(ClientHandler clientHandler) throws IOException {
         clients.add(clientHandler);
         broadcastClientList();
+
+       reverseFile(clientHandler);
+
     }
 
     public void unsubscribe(ClientHandler clientHandler) {

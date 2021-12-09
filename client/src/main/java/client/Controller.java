@@ -117,30 +117,7 @@ public class Controller implements Initializable {
                         if (str.startsWith("/auth_ok")){
                             nickname = str.split("\\s+")[1];
                             setAuthenticated(true);
-                            try {
-                                BufferedReader br = new BufferedReader(new FileReader("chat1.txt"));
-                                String line;
-                                ArrayList<String> list = new ArrayList<>();
 
-                                while ((line = br.readLine()) != null){
- //                               textArea.appendText(line + "\n");
-                                    list.add(line);
-                            }
-                                int j;
-                                if (list.size() < 101){
-
-                                    j = 0;
-                                } else { j = list.size() - 100;
-                                }
-                                    for (int i = j; i < list.size(); i++) {
-                                        textArea.appendText(list.get(i) + "\n");
-                                    }
-                                    break;
-
-                            } catch (IOException e) {
-
-                                e.printStackTrace();
-                            }
                             break;
                         }} else {
                             textArea.appendText(str + "\n");
@@ -150,8 +127,6 @@ public class Controller implements Initializable {
                     //цикл работы
                     while (authenticated) {
                         String str = in.readUTF();
-
-
 
                         if (str.startsWith("/")){
 

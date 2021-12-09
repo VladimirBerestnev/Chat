@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ClientHandler {
 
@@ -24,7 +25,8 @@ public class ClientHandler {
          in = new DataInputStream(socket.getInputStream());
          out = new DataOutputStream(socket.getOutputStream());
 
-         new Thread(() -> {
+   //      new Thread(() -> {
+             server.getExecutorService().execute(() -> {
              try {
                  // цикл аутентификации
                  while (true) {
@@ -49,7 +51,9 @@ public class ClientHandler {
                              if (!server.isLoginAuthenticated(login)) {
                                  nickName = newNick;
                                  sendMsg("/auth_ok " + nickName);
+
                                  server.subscribe(this);
+
                                  System.out.println("Client authenticated. nick " + nickName
                                          + " Address: " + socket.getRemoteSocketAddress());
                                  break;
@@ -127,7 +131,7 @@ public class ClientHandler {
                      e.printStackTrace();
                  }
              }
-         }).start();
+         });
 
      } catch (IOException e) {
          e.printStackTrace();
