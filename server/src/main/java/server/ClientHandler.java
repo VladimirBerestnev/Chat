@@ -1,5 +1,8 @@
 package server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -15,6 +18,8 @@ public class ClientHandler {
     private String nickName;
     private String login;
     private String password;
+    private static final Logger logger = LogManager.getLogger("chatLogger");
+    private static final Logger loggerError = LogManager.getLogger("chatError");
 
  public ClientHandler(Server server, Socket socket){
 
@@ -33,6 +38,7 @@ public class ClientHandler {
                      String str = in.readUTF();
                      if (str.equals("/end")) {
                          out.writeUTF("/end");
+                         logger.info("Client disconnect. nick: " + nickName);
                          throw (new RuntimeException("Клиент отключился"));
                      }
 
@@ -54,7 +60,7 @@ public class ClientHandler {
 
                                  server.subscribe(this);
 
-                                 System.out.println("Client authenticated. nick " + nickName
+                                 logger.info("Client authenticated. nick " + nickName
                                          + " Address: " + socket.getRemoteSocketAddress());
                                  break;
                              } else {
@@ -62,6 +68,7 @@ public class ClientHandler {
                              }
                          } else {
                              sendMsg("wrong login or password");
+                             logger.info("Client wrote wrong login or password");
                          }
                      }
 
@@ -76,6 +83,7 @@ public class ClientHandler {
                          boolean b = server.getRegistration(token[1], token[2], token[3]);
                          if (b) {
                              sendMsg("/reg_ok");
+                             logger.info("Client reg with nick: " + token[3]);
                          } else {
                              sendMsg("/reg_no");
                          }
@@ -89,6 +97,7 @@ public class ClientHandler {
                      if (str.startsWith("/")) {
                          if (str.equals("/end")) {
                              out.writeUTF("/end");
+                             logger.info("Client disconnect. nick: " + nickName);
                              break;
                          }
                          if (str.startsWith("/change")) {
@@ -119,22 +128,22 @@ public class ClientHandler {
                      }
                  }
              }catch (RuntimeException e) {
-                 System.out.println(e.getMessage());
-             } catch (IOException | SQLException e) {
+                 loggerError.error("Error creation thread by ExecutorService", e);
+             } catch (IOException e) {
                  e.printStackTrace();
              } finally {
                  server.unsubscribe(this);
-                 System.out.println("Disconnect " + socket.getRemoteSocketAddress());
+     //            logger.info(" Client disconnect " + socket.getRemoteSocketAddress());
                  try {
                      socket.close();
                  } catch (IOException e) {
-                     e.printStackTrace();
+                     loggerError.error("Error close socket", e);
                  }
              }
          });
 
      } catch (IOException e) {
-         e.printStackTrace();
+         loggerError.error("Error creation new ClientHandler", e);
      }
  }
 
@@ -142,7 +151,7 @@ public class ClientHandler {
      try {
          out.writeUTF(msg);
      } catch (IOException e) {
-         e.printStackTrace();
+         loggerError.error("Error send message", e);
      }
  }
 

@@ -14,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Server {
 
@@ -24,6 +26,8 @@ public class Server {
     private AuthService authService;
     private Connection connection;
     private ExecutorService executorService;
+    private static final Logger logger = LogManager.getLogger("chatLogger");
+    private static final Logger loggerError = LogManager.getLogger("chatError");
 
     public ExecutorService getExecutorService() {
         return executorService;
@@ -38,12 +42,13 @@ public class Server {
             server = new ServerSocket(PORT);
             //Соединение с БД
             connectDB();
-            System.out.println("Started");
+          //  System.out.println("Started");
+            logger.info("Server started");
 
             while (true) {
 
                 socket = server.accept();
-                System.out.println("Connect " + socket.getRemoteSocketAddress());
+                logger.info("Client connect " + socket.getRemoteSocketAddress());
                 new ClientHandler(this, socket);
 
                 Thread t1 = new Thread(() -> {
@@ -69,16 +74,17 @@ public class Server {
                 t1.start();
             }
         } catch (IOException | SQLException e) {
-            e.printStackTrace();
+            loggerError.error("Error client connection", e);
 
         } finally {
             try {
+                logger.info("Server closed");
                 socket.close();
                 server.close();
                 //Закрыть соединение с БД
                 disconnectDB();
             } catch (IOException | SQLException e) {
-                e.printStackTrace();
+                loggerError.error("Error server or socket close", e);
             }
         }
     }
@@ -89,7 +95,7 @@ public class Server {
         }
     }
 
-    public void broadcastMsg(ClientHandler sender, String msg) throws IOException {
+    public void broadcastMsg(ClientHandler sender, String msg) {
         try(BufferedWriter bw = new BufferedWriter(new FileWriter("chat1.txt", true))){
 
         String message = String.format("%s : %s", sender.getNickName(), msg);
@@ -97,7 +103,11 @@ public class Server {
         for (ClientHandler c : clients) {
             c.sendMsg(message);
         }
+        logger.info("User " + sender.getNickName() + " wrote message");
+        } catch (IOException e){
+            loggerError.error("File chat1.txt not found", e);
         }
+
     }
 
     public void reverseFile (ClientHandler clientHandler) throws IOException {
@@ -119,6 +129,7 @@ public class Server {
             clientHandler.sendMsg(chatLines.get(chatLines.size() - j));
         }
         reader.close();
+
     }
 
 
@@ -184,6 +195,7 @@ public class Server {
             try {
                 connection.close();
             } catch (SQLException e) {
+                loggerError.error("Error close connection DB", e);
                 throw new RuntimeException(e);
             }
         }
@@ -212,7 +224,7 @@ public class Server {
                 return rs.getString(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            loggerError.error("Error get nickname", e);
         }
         return null;
     }
@@ -230,12 +242,12 @@ public class Server {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            loggerError.error("Error check nickname", e);
         }
         return nick;
     }
 
-    public String changeNick(String nick, ClientHandler client) throws SQLException {
+    public String changeNick(String nick, ClientHandler client) {
         String nickname = checkNick(nick);
         String login = client.getLogin();
         if (nickname != null) {
@@ -244,6 +256,8 @@ public class Server {
                 ps3.setString(2, login);
                 ps3.executeUpdate();
                 return nickname;
+            } catch (SQLException e) {
+                loggerError.error("Error change nick", e);
             }
         }
         return null;
@@ -261,7 +275,7 @@ public class Server {
                 return true;
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                loggerError.error("Error registration new client", e);
             }
         }
         return false;
