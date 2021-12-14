@@ -1,0 +1,42 @@
+<Configuration>
+
+    <Properties>
+        <Property name="basePath">chatLog</Property>
+    </Properties>
+
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %C:%L - %msg%n"/>
+        </Console>
+
+        <File name="File" filename="${basePath}/logfile.log"  append="true">
+            <PatternLayout pattern="%d{HH:mm:ss} [%t] %C (%F:%L) - %msg%n"/>
+        </File>
+
+        <File name="FileError" filename="${basePath}/logError.log"  append="true">
+            <PatternLayout pattern="%d{HH:mm:ss} [%t] %C (%F:%L) - %msg%n"/>
+        </File>
+
+
+    </Appenders>
+
+    <Loggers>
+        <Logger name= "chatLogger" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+
+        <Logger name= "chatError" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileError"/>
+        </Logger>
+
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
+            <AppenderRef ref="FileError"/>
+        </Root>
+    </Loggers>
+</Configuration>

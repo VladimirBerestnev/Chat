@@ -5,8 +5,6 @@ import java.util.List;
 
 public class SimpleAuthService implements AuthService {
 
-
-
     private class userdata{
         String login;
         String password;
@@ -17,7 +15,6 @@ public class SimpleAuthService implements AuthService {
             this.password = password;
             this.nickname = nickname;
         }
-
     }
 
     private List<userdata> users;
@@ -27,7 +24,6 @@ public class SimpleAuthService implements AuthService {
         users.add(new userdata("user1", "user1", "user1"));
         users.add(new userdata("user2", "user2", "user2"));
         users.add(new userdata("user3", "user3", "user3"));
-
     }
 
     @Override
@@ -37,7 +33,6 @@ public class SimpleAuthService implements AuthService {
                 return u.nickname;
         }
         return null;
-
     }
 
     @Override
@@ -49,5 +44,4 @@ public class SimpleAuthService implements AuthService {
         users.add(new userdata(login, password, nickname));
         return true;
     }
-
 }

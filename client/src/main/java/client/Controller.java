@@ -1,5 +1,4 @@
 package client;
-
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,15 +18,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -57,7 +54,6 @@ public class Controller implements Initializable {
     private Stage regStage;
     private RegController regController;
 
-
     private void setAuthenticated (boolean authenticated){
         this.authenticated = authenticated;
         authPanel.setVisible(!authenticated);
@@ -72,7 +68,6 @@ public class Controller implements Initializable {
         }
         setTitle(nickname);
         textArea.clear();
-
     }
 
     @Override
@@ -92,11 +87,7 @@ public class Controller implements Initializable {
             });
         });
         setAuthenticated(false);
-
     }
-
-
-
 
     private void connect(){
         try {
@@ -115,7 +106,6 @@ public class Controller implements Initializable {
                         if (str.equals("/end")){
                             break;
                         }
-
                             if (str.equals("/reg_ok")){
                                 regController.showResult("/reg_ok");
                             }
@@ -124,18 +114,14 @@ public class Controller implements Initializable {
                                 regController.showResult("/reg_no");
                             }
 
-
                         if (str.startsWith("/auth_ok")){
                             nickname = str.split("\\s+")[1];
                             setAuthenticated(true);
-                            break;
-                        }
 
-                        } else {
+                            break;
+                        }} else {
                             textArea.appendText(str + "\n");
                         }
-
-
                     }
 
                     //цикл работы
@@ -147,9 +133,7 @@ public class Controller implements Initializable {
                         if (str.equals("/end")){
                             System.out.println("Disconnect");
                             break;
-
                         }
-
                             //Обновление списка клиентов
                             if (str.startsWith("/clientList")){
                                 String[] token = str.split("\\s+");
@@ -158,17 +142,11 @@ public class Controller implements Initializable {
                                     for (int i = 1; i <token.length ; i++) {
                                         clientList.getItems().add(token[i]);
                                     }
-
                                 });
                             }
-
-
-
                         }else {
                             textArea.appendText(str + "\n");
                         }
-
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -180,17 +158,11 @@ public class Controller implements Initializable {
                         e.printStackTrace();
                     }
                 }
-
-
             }).start();
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-
 
     public void sendMsg() {
         try {
@@ -200,9 +172,7 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 
     public void tryToAuth(ActionEvent actionEvent) {
 
@@ -217,7 +187,6 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void setTitle (String nickname){
@@ -227,14 +196,12 @@ public class Controller implements Initializable {
             } else {
                 stage.setTitle(String.format("Chat: [%s]", nickname));
             }
-
         });
     }
 
     public void clickClientList(MouseEvent mouseEvent) {
         String receiver = clientList.getSelectionModel().getSelectedItem();
         textField.setText("/w " + receiver + " ");
-
     }
 
     private void createRegWindow(){
@@ -256,11 +223,9 @@ public class Controller implements Initializable {
         }
     }
 
-
     public void tryToReg(ActionEvent actionEvent) {
         if (regStage == null){
             createRegWindow();
-
         }
         regStage.show();
     }
@@ -276,10 +241,5 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
-
-
-
 }

@@ -33,9 +33,7 @@ public class RegController {
         }else {
             textArea.appendText("Регистрация не удалась. \nВозможно логин или nickname уже заняты.\n");
         }
-
     }
-
 
     public void setController(Controller controller) {
         this.controller = controller;
